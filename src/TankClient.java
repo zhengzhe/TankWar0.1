@@ -14,9 +14,13 @@ import org.eclipse.swt.widgets.Shell;
 
 public class TankClient {
 
+	public static final int GAME_HEIGHT = 600;
+	public static final int GAME_WIDTH = 800;
+	
 	protected Shell shell;
 	protected int x=50;
 	protected int y=50;
+	protected Tank myTank = new Tank(5, 5, 30, 30);
 	
 	//内部类，定义在其他类的内部
 	private class PaintThread implements Runnable{
@@ -78,9 +82,9 @@ public class TankClient {
 	 */
 	protected void createContents() {
 		shell = new Shell(SWT.CLOSE|SWT.NO_BACKGROUND|SWT.DOUBLE_BUFFERED);
-		shell.setSize(800, 600);
+		shell.setSize(GAME_WIDTH, GAME_HEIGHT);//硬编码
 		Rectangle screen = Display.getDefault().getPrimaryMonitor().getBounds();
-		shell.setLocation((screen.width-800)/2,(screen.height-600)/2);
+		shell.setLocation((screen.width-GAME_WIDTH)/2,(screen.height-GAME_HEIGHT)/2);
 		
 		shell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
 		
@@ -88,7 +92,6 @@ public class TankClient {
 		shell.addPaintListener(new PaintListener() {
 			@Override
 			public void paintControl(PaintEvent e) {
-				
 				
 				//在内存中创建图像缓冲区
 				Image bufferScreen = new Image(null, shell.getClientArea());
@@ -99,9 +102,9 @@ public class TankClient {
 				gcImage.setBackground(shell.getBackground());
 				gcImage.fillRectangle(shell.getClientArea());
 				
-				Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
-				gcImage.setBackground(red);
-				gcImage.fillOval(x, y, 30, 30);
+				if (myTank!=null) {
+					myTank.draw(gcImage);
+				}
 				
 				//将内存中画好的图像一次性贴到屏幕上
 				e.gc.drawImage(bufferScreen, 0, 0);
@@ -123,29 +126,15 @@ public class TankClient {
 			
 			@Override
 			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public void keyPressed(KeyEvent e) {
 				
-				switch (e.keyCode) {
-				case SWT.ARROW_LEFT:
-					x-=5;
-					break;
-				case SWT.ARROW_DOWN:
-					y+=5;
-					break;
-				case SWT.ARROW_RIGHT:
-					x+=5;
-					break;
-				case SWT.ARROW_UP:
-					y-=5;
-					break;
-				default:
-					break;
-				}
+				
+				myTank.keyPressed(e);
+				
 				
 			}
 		});
