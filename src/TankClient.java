@@ -4,6 +4,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -76,7 +77,7 @@ public class TankClient {
 	 * Create contents of the window.
 	 */
 	protected void createContents() {
-		shell = new Shell(SWT.CLOSE);
+		shell = new Shell(SWT.CLOSE|SWT.NO_BACKGROUND|SWT.DOUBLE_BUFFERED);
 		shell.setSize(800, 600);
 		Rectangle screen = Display.getDefault().getPrimaryMonitor().getBounds();
 		shell.setLocation((screen.width-800)/2,(screen.height-600)/2);
@@ -87,10 +88,29 @@ public class TankClient {
 		shell.addPaintListener(new PaintListener() {
 			@Override
 			public void paintControl(PaintEvent e) {
-				GC gc =e.gc; //得到画笔
+				
+				
+				//在内存中创建图像缓冲区
+				Image bufferScreen = new Image(null, shell.getClientArea());
+				//创建一支能在图像缓冲区上绘制的"画笔"
+				GC gcImage = new GC(bufferScreen);
+				
+				//在内存缓冲区中绘制图形
+				gcImage.setBackground(shell.getBackground());
+				gcImage.fillRectangle(shell.getClientArea());
+				
 				Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
-				gc.setBackground(red);
-				gc.fillOval(x, y, 30, 30);
+				gcImage.setBackground(red);
+				gcImage.fillOval(x, y, 30, 30);
+				
+				//将内存中画好的图像一次性贴到屏幕上
+				e.gc.drawImage(bufferScreen, 0, 0);
+				
+				
+//				GC gc =e.gc; //得到画笔
+//				Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
+//				gc.setBackground(red);
+//				gc.fillOval(x, y, 30, 30);
 				
 			}
 		});
