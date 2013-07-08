@@ -106,11 +106,15 @@ public class TankClient {
 				//将内存中画好的图像一次性贴到屏幕上
 				e.gc.drawImage(bufferScreen, 0, 0);
 				
-				
-//				GC gc =e.gc; //得到画笔
-//				Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
-//				gc.setBackground(red);
-//				gc.fillOval(x, y, 30, 30);
+				//释放资源
+				if (bufferScreen!=null) {
+					bufferScreen.dispose();
+					bufferScreen=null;
+				}
+				if (gcImage!=null) {
+					gcImage.dispose();
+					gcImage=null;
+				}
 				
 			}
 		});
