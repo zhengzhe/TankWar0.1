@@ -1,5 +1,7 @@
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -28,8 +30,6 @@ public class TankClient {
 					@Override
 					public void run() {
 						shell.redraw();
-						x+=5;
-						y+=5;
 					}
 				});
 				
@@ -114,6 +114,37 @@ public class TankClient {
 				if (gcImage!=null) {
 					gcImage.dispose();
 					gcImage=null;
+				}
+				
+			}
+		});
+		
+		shell.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				
+				switch (e.keyCode) {
+				case SWT.ARROW_LEFT:
+					x-=5;
+					break;
+				case SWT.ARROW_DOWN:
+					y+=5;
+					break;
+				case SWT.ARROW_RIGHT:
+					x+=5;
+					break;
+				case SWT.ARROW_UP:
+					y-=5;
+					break;
+				default:
+					break;
 				}
 				
 			}
