@@ -15,7 +15,15 @@ public class Missile {
 	int x;
 	int y;
 	Tank.Direction dir;
-	private int STEP_LEN=10;;
+	private int STEP_LEN=10;
+	
+	private boolean live=true;
+	
+	public boolean isLive() {
+		return live;
+	}
+	
+	
 	public Missile(int x, int y, Direction dir) {
 		super();
 		this.x = x;
@@ -23,10 +31,13 @@ public class Missile {
 		this.dir = dir;
 	}
 	public void draw(GC gcImage) {
-		Color color = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
-		gcImage.setBackground(color);
-		gcImage.fillOval(x, y, width, height);
-		move();
+		if (isLive()) {
+			Color color = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+			gcImage.setBackground(color);
+			gcImage.fillOval(x, y, width, height);
+			move();
+		}
+		
 	}
 	public void move() {
 		switch (dir) {
@@ -60,6 +71,10 @@ public class Missile {
 			break;
 		default:
 			break;
+		}
+		
+		if (x<0||y<0||x>TankClient.GAME_WIDTH||y>TankClient.GAME_HEIGHT) {
+			live = false;
 		}
 		
 		

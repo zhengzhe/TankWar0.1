@@ -89,16 +89,36 @@ public class Tank {
 			ptDir = dir;
 		}
 		
+		if (x<0) {
+			x=0;
+		}
+		if (y<0) {
+			y=0;
+		}
+		if (x>TankClient.GAME_WIDTH-width) {
+			x=TankClient.GAME_WIDTH-width;
+		}
+		if (y>TankClient.GAME_HEIGHT-height) {
+			y=TankClient.GAME_HEIGHT-height;
+		}
+		
 	}
 	public void draw(GC gc) {
 		Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
 		gc.setBackground(red);
 		gc.fillOval(x, y, width, height);
+		gc.drawString("ÅÚµ¯ÊýÁ¿"+missiles.size(),20,10);
 		
-		for (Missile missile : missiles) {
-			missile.draw(gc);
+		
+		for (int i = 0; i < missiles.size(); i++) {
+			Missile missile = missiles.get(i);
+			if(missile.isLive())
+				missile.draw(gc);
+			else {
+				missiles.remove(missile);
+			}
 		}
-		
+			
 		switch (ptDir) {
 		case D:
 			gc.drawLine(x+width/2, y+height/2, x+width/2, y+height);
