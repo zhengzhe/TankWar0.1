@@ -1,4 +1,7 @@
 package nbcc;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Color;
@@ -29,8 +32,9 @@ public class Tank {
 	}
 	
 	Direction dir=Direction.STOP;
-	private Missile missile;
 	public Direction ptDir = Direction.R;
+	
+	List<Missile> missiles = new ArrayList<Missile>();
 	
 	
 	public Tank(int x,int y,int width,int height) {
@@ -90,7 +94,8 @@ public class Tank {
 		Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
 		gc.setBackground(red);
 		gc.fillOval(x, y, width, height);
-		if (missile!=null) {
+		
+		for (Missile missile : missiles) {
 			missile.draw(gc);
 		}
 		
@@ -194,7 +199,7 @@ public class Tank {
 			bD = false;
 			break;
 		case SWT.CTRL:
-			missile = fire();
+			fire();
 			break;
 		default:
 			break;
@@ -208,6 +213,7 @@ public class Tank {
 		int y = this.y +height/2-Missile.height/2;
 		
 		Missile m = new Missile(x,y,ptDir);
+		missiles.add(m);
 		return m;
 	}
 	
