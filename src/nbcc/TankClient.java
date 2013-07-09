@@ -1,13 +1,10 @@
 package nbcc;
 
-import nbcc.Tank.Direction;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -23,8 +20,7 @@ public class TankClient {
 	protected Shell shell;
 	protected int x=50;
 	protected int y=50;
-	protected Tank myTank = new Tank(50, 50, 30, 30,this);
-	public Missile missile =null;
+	protected Tank myTank = new Tank(50, 50, 30, 30);
 	
 	
 	//内部类，定义在其他类的内部
@@ -111,9 +107,9 @@ public class TankClient {
 				if (myTank!=null) {
 					myTank.draw(gcImage);
 				}
-				if (missile!=null) {
-					missile.draw(gcImage);
-				}
+//				if (missile!=null) {
+//					missile.draw(gcImage);
+//				}
 				
 				
 				//将内存中画好的图像一次性贴到屏幕上
@@ -133,9 +129,7 @@ public class TankClient {
 		});
 		
 		
-		
 		shell.addKeyListener(new KeyListener() {
-			
 			@Override
 			public void keyReleased(KeyEvent e) {
 				myTank.keyReleased(e);

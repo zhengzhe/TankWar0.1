@@ -29,8 +29,8 @@ public class Tank {
 	}
 	
 	Direction dir=Direction.STOP;
-	private TankClient tc;
-//	private Missile missile;
+	private Missile missile;
+	public Direction ptDir = Direction.R;
 	
 	
 	public Tank(int x,int y,int width,int height) {
@@ -43,10 +43,6 @@ public class Tank {
 	}
 
 
-	public Tank(int x, int y, int w, int h, TankClient tc) {
-		this(x,y,w,h);
-		this.tc = tc;
-	}
 
 
 	/**
@@ -92,9 +88,9 @@ public class Tank {
 		Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
 		gc.setBackground(red);
 		gc.fillOval(x, y, width, height);
-//		if (missile!=null) {
-//			missile.draw(gc);
-//		}
+		if (missile!=null) {
+			missile.draw(gc);
+		}
 		move();
 	}
 
@@ -146,9 +142,9 @@ public class Tank {
 	}
 
 
-	private void printStatus() {
-		System.out.println("bL"+bL+",bU"+bU+",bR"+bR+",bD"+bD);
-	}
+//	private void printStatus() {
+//		System.out.println("bL"+bL+",bU"+bU+",bR"+bR+",bD"+bD);
+//	}
 
 
 	public void keyReleased(KeyEvent e) {
@@ -167,7 +163,7 @@ public class Tank {
 			bD = false;
 			break;
 		case SWT.CTRL:
-			tc.missile = fire();
+			missile = fire();
 			break;
 		default:
 			break;
