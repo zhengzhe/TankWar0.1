@@ -1,3 +1,6 @@
+package nbcc;
+
+import nbcc.Tank.Direction;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -20,7 +23,9 @@ public class TankClient {
 	protected Shell shell;
 	protected int x=50;
 	protected int y=50;
-	protected Tank myTank = new Tank(5, 5, 30, 30);
+	protected Tank myTank = new Tank(50, 50, 30, 30,this);
+	public Missile missile =null;
+	
 	
 	//内部类，定义在其他类的内部
 	private class PaintThread implements Runnable{
@@ -90,6 +95,7 @@ public class TankClient {
 		
 		//匿名内类，通常，如果需要实现某个接口，而不想定义一个完整类，
 		shell.addPaintListener(new PaintListener() {
+			
 			@Override
 			public void paintControl(PaintEvent e) {
 				
@@ -105,6 +111,10 @@ public class TankClient {
 				if (myTank!=null) {
 					myTank.draw(gcImage);
 				}
+				if (missile!=null) {
+					missile.draw(gcImage);
+				}
+				
 				
 				//将内存中画好的图像一次性贴到屏幕上
 				e.gc.drawImage(bufferScreen, 0, 0);
@@ -121,6 +131,8 @@ public class TankClient {
 				
 			}
 		});
+		
+		
 		
 		shell.addKeyListener(new KeyListener() {
 			

@@ -1,3 +1,4 @@
+package nbcc;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Color;
@@ -28,6 +29,8 @@ public class Tank {
 	}
 	
 	Direction dir=Direction.STOP;
+	private TankClient tc;
+//	private Missile missile;
 	
 	
 	public Tank(int x,int y,int width,int height) {
@@ -37,6 +40,12 @@ public class Tank {
 		this.width = width;
 		this.height = height;
 		
+	}
+
+
+	public Tank(int x, int y, int w, int h, TankClient tc) {
+		this(x,y,w,h);
+		this.tc = tc;
 	}
 
 
@@ -83,7 +92,9 @@ public class Tank {
 		Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
 		gc.setBackground(red);
 		gc.fillOval(x, y, width, height);
-		
+//		if (missile!=null) {
+//			missile.draw(gc);
+//		}
 		move();
 	}
 
@@ -91,6 +102,7 @@ public class Tank {
 
 
 	public void keyPressed(KeyEvent e) {
+		System.out.println(e.character+" Pressed");
 		switch (e.keyCode) {
 		case SWT.ARROW_UP:
 			bU = true;
@@ -127,8 +139,8 @@ public class Tank {
 		else if(bL&& !bU&&!bR&&bD) dir = Direction.DL;
 		else if(!bL&& !bU&&!bR&&!bD) dir = Direction.STOP;
 		
-		System.out.println(dir);
-		printStatus();
+//		System.out.println(dir);
+//		printStatus();
 		
 			
 	}
@@ -140,23 +152,36 @@ public class Tank {
 
 
 	public void keyReleased(KeyEvent e) {
+		System.out.println("key released: "+e.character);
 		switch (e.keyCode) {
+		case SWT.ARROW_UP:
+			bU = false;
+			break;
 		case SWT.ARROW_LEFT:
 			bL = false;
-			break;
-		case SWT.ARROW_DOWN:
-			bD = false;
 			break;
 		case SWT.ARROW_RIGHT:
 			bR = false;
 			break;
-		case SWT.ARROW_UP:
-			bU = false;
+		case SWT.ARROW_DOWN:
+			bD = false;
+			break;
+		case SWT.CTRL:
+			tc.missile = fire();
 			break;
 		default:
 			break;
 		}
 		locateDirection();
+	}
+	
+	public Missile fire() {
+		
+		int x  = this.x + width/2-Missile.width/2;
+		int y = this.y +height/2-Missile.height/2;
+		
+		Missile m = new Missile(x,y,dir);
+		return m;
 	}
 	
 	
