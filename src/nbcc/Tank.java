@@ -6,6 +6,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 
@@ -16,6 +17,9 @@ public class Tank {
 	int y;
 	int width=30;
 	int height=30;
+	
+	boolean bGood;
+	
 	
 	public boolean bL=false,bU=false,bR=false,bD=false;
 	
@@ -35,15 +39,23 @@ public class Tank {
 	public Direction ptDir = Direction.R;
 	
 	List<Missile> missiles = new ArrayList<Missile>();
+	private TankClient tc;
+	private boolean live=true;
 	
 	
-	public Tank(int x,int y,int width,int height) {
+	public Tank(int x,int y,int width,int height,boolean isGood) {
 		
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		this.bGood = isGood;
 		
+	}
+	
+	public Tank(int x,int y,int width,int height,boolean isGood,TankClient tc){
+		this(x,y,width,height,isGood);
+		this.tc = tc;
 	}
 
 
@@ -104,14 +116,26 @@ public class Tank {
 		
 	}
 	public void draw(GC gc) {
+		
+		
 		Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
 		gc.setBackground(red);
-		gc.fillOval(x, y, width, height);
 		gc.drawString("ÅÚµ¯ÊýÁ¿"+missiles.size(),20,10);
 		
+		if (bGood) {
+			gc.setBackground(red);
+		}else {
+			gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
+		}
+		if (live) {
+			gc.fillOval(x, y, width, height);
+			drawPtDir(gc);
+		}
 		
 		for (int i = 0; i < missiles.size(); i++) {
 			Missile missile = missiles.get(i);
+			if(missile.hitTank(tc.enemyTank))
+				missile.setLive(false);
 			if(missile.isLive())
 				missile.draw(gc);
 			else {
@@ -119,6 +143,10 @@ public class Tank {
 			}
 		}
 			
+		move();
+	}
+
+	private void drawPtDir(GC gc) {
 		switch (ptDir) {
 		case D:
 			gc.drawLine(x+width/2, y+height/2, x+width/2, y+height);
@@ -146,8 +174,6 @@ public class Tank {
 		default:
 			break;
 		}
-		
-		move();
 	}
 
 
@@ -235,6 +261,14 @@ public class Tank {
 		Missile m = new Missile(x,y,ptDir);
 		missiles.add(m);
 		return m;
+	}
+
+	public Rectangle getRect() {
+		return new Rectangle(x, y, width, height);
+	}
+
+	public void setLive(boolean isLive) {
+		this.live = isLive;
 	}
 	
 	

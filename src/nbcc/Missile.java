@@ -2,6 +2,7 @@ package nbcc;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 import nbcc.Tank.Direction;
@@ -78,6 +79,25 @@ public class Missile {
 		}
 		
 		
+	}
+
+
+	public boolean hitTank(Tank enemyTank) {
+		Rectangle rec= new Rectangle(x, y, width, height);
+		if(rec.intersects(enemyTank.getRect()))
+		{
+			enemyTank.setLive(false);
+			return true;
+		}
+			
+		else {
+			return false;
+		}
+	}
+
+
+	public void setLive(boolean isLive) {
+		this.live = isLive;
 	}
 	
 	

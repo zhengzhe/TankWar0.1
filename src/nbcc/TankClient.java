@@ -20,7 +20,10 @@ public class TankClient {
 	protected Shell shell;
 	protected int x=50;
 	protected int y=50;
-	protected Tank myTank = new Tank(50, 50, 30, 30);
+	protected Tank myTank = new Tank(50, 50, 30, 30,true,this);
+	protected Tank enemyTank = new Tank(100, 50, 50, 50, false);
+	
+	
 	
 	
 	//内部类，定义在其他类的内部
@@ -106,6 +109,9 @@ public class TankClient {
 				
 				if (myTank!=null) {
 					myTank.draw(gcImage);
+				}
+				if (enemyTank!=null) {
+					enemyTank.draw(gcImage);
 				}
 //				if (missile!=null) {
 //					missile.draw(gcImage);
