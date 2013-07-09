@@ -135,7 +135,9 @@ public class Tank {
 		for (int i = 0; i < missiles.size(); i++) {
 			Missile missile = missiles.get(i);
 			if(missile.hitTank(tc.enemyTank))
-				missile.setLive(false);
+			{
+				new Explode(tc.enemyTank.x, tc.enemyTank.y, tc).start();
+			}
 			if(missile.isLive())
 				missile.draw(gc);
 			else {

@@ -19,6 +19,7 @@ public class Missile {
 	private int STEP_LEN=10;
 	
 	private boolean live=true;
+	private Explode e;
 	
 	public boolean isLive() {
 		return live;
@@ -32,6 +33,8 @@ public class Missile {
 		this.dir = dir;
 	}
 	public void draw(GC gcImage) {
+		
+		
 		if (isLive()) {
 			Color color = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
 			gcImage.setBackground(color);
@@ -84,9 +87,10 @@ public class Missile {
 
 	public boolean hitTank(Tank enemyTank) {
 		Rectangle rec= new Rectangle(x, y, width, height);
-		if(rec.intersects(enemyTank.getRect()))
+		if(rec.intersects(enemyTank.getRect())&& isLive())
 		{
 			enemyTank.setLive(false);
+			this.live = false;
 			return true;
 		}
 			
@@ -99,9 +103,5 @@ public class Missile {
 	public void setLive(boolean isLive) {
 		this.live = isLive;
 	}
-	
-	
-	
-	
 
 }
