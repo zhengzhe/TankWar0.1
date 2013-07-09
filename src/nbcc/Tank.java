@@ -81,7 +81,9 @@ public class Tank {
 		default:
 			break;
 		}
-		
+		if (dir!=Direction.STOP) {
+			ptDir = dir;
+		}
 		
 	}
 	public void draw(GC gc) {
@@ -91,6 +93,35 @@ public class Tank {
 		if (missile!=null) {
 			missile.draw(gc);
 		}
+		
+		switch (ptDir) {
+		case D:
+			gc.drawLine(x+width/2, y+height/2, x+width/2, y+height);
+			break;
+		case DL:
+			gc.drawLine(x+width/2, y+height/2, x, y+height);
+			break;
+		case L:
+			gc.drawLine(x+width/2, y+height/2, x, y+height/2);
+			break;
+		case LU:
+			gc.drawLine(x+width/2, y+height/2, x, y);
+			break;
+		case R:
+			gc.drawLine(x+width/2, y+height/2, x+width,y+height/2);
+			break;
+		case RD:
+			gc.drawLine(x+width/2, y+height/2, x+width, y+height);
+			break;
+		case RU:
+			gc.drawLine(x+width/2, y+height/2, x+width, y);
+			break;
+		case U:
+			gc.drawLine(x+width/2, y+height/2, x+width/2,y);
+		default:
+			break;
+		}
+		
 		move();
 	}
 
@@ -176,7 +207,7 @@ public class Tank {
 		int x  = this.x + width/2-Missile.width/2;
 		int y = this.y +height/2-Missile.height/2;
 		
-		Missile m = new Missile(x,y,dir);
+		Missile m = new Missile(x,y,ptDir);
 		return m;
 	}
 	
