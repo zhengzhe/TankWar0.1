@@ -31,4 +31,5 @@ public class Wall {
 		return new Rectangle(x, y, width, height);
 	}
 
+
 }

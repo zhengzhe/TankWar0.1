@@ -24,8 +24,9 @@ public class Tank {
 	boolean bGood;
 	
 	private static Random r = new Random();
+	int life=100;
 	
-	
+	private BloodBar bb = new BloodBar();
 	public boolean bL=false,bU=false,bR=false,bD=false;
 	
 	public enum Direction{
@@ -107,13 +108,13 @@ public class Tank {
 	private boolean hitWall(Wall w) {
 		
 		if (isLive()&&getRect().intersects(w.getRect())) {
-			x = oldX;
-			y = oldY;
+			stay();
 			return true;
 		}
 		return false;
 		
 	}
+
 
 	private void dealPtDir() {
 		if (dir!=Direction.STOP) {
@@ -123,6 +124,7 @@ public class Tank {
 
 	private void dealXY() {
 		switch (dir) {
+		
 		case L:
 			x-=STEP_LEN;
 			break;
@@ -182,7 +184,9 @@ public class Tank {
 		if (bGood) {
 			//绘制我方坦克
 			gc.drawString("炮弹数量"+missiles.size(),20,10);
-			if (live) {
+			if (live) 
+			{
+				bb.draw(gc);
 				drawTank(gc, red);
 			}
 		}else {
@@ -212,19 +216,48 @@ public class Tank {
 			
 			if(missile.isLive())
 				missile.draw(gc);
-			else {
+			else 
 				missiles.remove(missile);
-			}
+			
+	
 		}
+		hitTanks(tc.enemyTanks);
 			
 		move();
 	}
 
+	public boolean hitTanks(List<Tank> tanks) {
+		for (Tank otherTank : tanks) {
+			if (this!=otherTank) {
+				if (this.live&&otherTank.live&&this.getRect().intersects(otherTank.getRect())) {
+					this.stay();
+					otherTank.stay();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private void stay() {
+		x = oldX;
+		y = oldY;
+	}
+	
+	
+	
 	private boolean hitTank(Missile missile, Tank anyTank) {
 		if(missile.hitTank(anyTank))
 		{
 			
 			new Explode(anyTank.x, anyTank.y, tc).start();
+			
+			if (anyTank.bGood) {
+				life-=20;
+				if (life<0) {
+					anyTank.live=false;
+				}
+			}
 			return true;
 		}
 		return false;
@@ -269,6 +302,12 @@ public class Tank {
 	public void keyPressed(KeyEvent e) {
 		System.out.println(e.character+" Pressed");
 		switch (e.keyCode) {
+		case SWT.F2:
+			if(!this.live){
+				this.live = true;
+				this.life = 100;
+			}
+			break;
 		case SWT.ARROW_UP:
 			bU = true;
 			break;
@@ -319,6 +358,10 @@ public class Tank {
 	public void keyReleased(KeyEvent e) {
 		System.out.println("key released: "+e.character);
 		switch (e.keyCode) {
+		case 'a':
+			supfire();
+			break;
+		
 		case SWT.ARROW_UP:
 			bU = false;
 			break;
@@ -351,6 +394,15 @@ public class Tank {
 		missiles.add(m);
 		return m;
 	}
+	public Missile fire(Direction dir){
+		int x  = this.x + width/2-Missile.width/2;
+		int y = this.y +height/2-Missile.height/2;
+		
+		Missile m = new Missile(x,y,bGood,dir);
+		missiles.add(m);
+		return m;
+	}
+	
 
 	public Rectangle getRect() {
 		return new Rectangle(x, y, width, height);
@@ -363,6 +415,23 @@ public class Tank {
 	public boolean isLive() {
 		return live;
 	}
-	
-	
+
+	public void supfire() {
+		Direction[] dirs =Direction.values();
+		for(int i=0; i<8;i++){
+			fire(dirs[i]);
+		}
+		}
+	private class BloodBar{
+
+
+		public void draw(GC gc) {
+			Color oldColor = gc.getBackground();
+			gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+			gc.drawRectangle(x,y-10,width,10);
+			int w = width * life/100;
+			gc.fillRectangle(x, y-10, w, 10);
+			gc.setBackground(oldColor);
+	}
+}
 }

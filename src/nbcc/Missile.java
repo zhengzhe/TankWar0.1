@@ -88,8 +88,13 @@ public class Missile {
 		//炮弹存在，坦克也活着，炮弹打到坦克上 而且，炮弹不能打自己
 		if(isLive()&& anyTank.isLive()&& getRect().intersects(anyTank.getRect())&& good!=anyTank.bGood )
 		{
-			anyTank.setLive(false);
-			this.live = false;
+			if (!anyTank.bGood) {
+				anyTank.setLive(false);
+			}else 
+			{
+				if(anyTank.life<0)
+					this.live = false;
+			}
 			return true;
 		}
 			

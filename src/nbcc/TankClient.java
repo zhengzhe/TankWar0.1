@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nbcc.Tank.Direction;
-
+import java.util.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -21,11 +21,14 @@ public class TankClient {
 
 	public static final int GAME_HEIGHT = 600;
 	public static final int GAME_WIDTH = 800;
+
+	private static final GC gcImage = null;
 	
 	protected Shell shell;
 	protected int x=50;
 	protected int y=50;
 	protected Tank myTank = new Tank(50, 50, 30, 30,true,this);
+	
 	protected List<Tank> enemyTanks = new ArrayList<Tank>();
 	protected Wall w1 = new Wall(100, 200, 20, 150),w2=new Wall(300, 100, 300, 20);
 	
@@ -100,7 +103,7 @@ public class TankClient {
 		
 		for (int i = 0; i < 10; i++) {
 			
-			enemyTanks.add(new Tank(100+i*50, 100, 30, 30, false,Direction.D,this));
+			enemyTanks.add(new Tank(200+i*50, 200, 30, 30, false,Direction.D,this));
 			
 		}
 		
@@ -123,6 +126,12 @@ public class TankClient {
 				gcImage.drawString("敌方坦克数量:"+enemyTanks.size(),20,30);
 				w1.draw(gcImage);
 				w2.draw(gcImage);
+				if(enemyTanks.size()<=0){
+					for(int i=0;i<10;i++){
+						enemyTanks.add(new Tank(200+i*50, 200, 30, 30, false,Direction.D,TankClient.this));
+					}
+					
+				}
 				
 				if (myTank!=null) {
 					myTank.draw(gcImage);
