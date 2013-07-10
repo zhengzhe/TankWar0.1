@@ -47,6 +47,8 @@ public class Tank {
 	private TankClient tc;
 	private boolean live=true;
 	private int step;
+	private int oldX,oldY;  //保存坦克上一次运动的坐标值
+	
 	
 	
 	public Tank(int x,int y,int width,int height,boolean isGood) {
@@ -77,6 +79,10 @@ public class Tank {
 	 * 根据用户按下的键盘方向，来确定坦克的运动
 	 */
 	public void move() {
+		
+		oldX = x;
+		oldY = y;
+		
 		dealXY();
 		dealPtDir();		
 		dealBound();
@@ -92,6 +98,21 @@ public class Tank {
 			}
 			step--;
 		}
+		
+		hitWall(tc.w1);
+		hitWall(tc.w2);
+		
+	}
+
+	private boolean hitWall(Wall w) {
+		
+		if (isLive()&&getRect().intersects(w.getRect())) {
+			x = oldX;
+			y = oldY;
+			return true;
+		}
+		return false;
+		
 	}
 
 	private void dealPtDir() {
@@ -157,15 +178,17 @@ public class Tank {
 		
 		Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
 //		gc.setBackground(red);
-		if (live) {
-			if (bGood) {
-				//绘制我方坦克
-				gc.drawString("炮弹数量"+missiles.size(),20,10);
+		
+		if (bGood) {
+			//绘制我方坦克
+			gc.drawString("炮弹数量"+missiles.size(),20,10);
+			if (live) {
 				drawTank(gc, red);
-			}else {
-				//绘制敌方坦克
-				drawTank(gc,Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
 			}
+		}else {
+			//绘制敌方坦克
+			if(live)
+				drawTank(gc,Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
 		}
 		
 		
@@ -173,14 +196,20 @@ public class Tank {
 		for (int i = 0; i < missiles.size(); i++) {
 			Missile missile = missiles.get(i);
 			
+			
+			//对每一个发送的子弹判断是否击中敌对坦克
 			for (int j = 0; j < tc.enemyTanks.size(); j++) {
 				Tank enemyTank = tc.enemyTanks.get(j);
-				if(missile.hitTank(enemyTank))
-				{
+				if(hitTank(missile, enemyTank))
 					tc.enemyTanks.remove(enemyTank);
-					new Explode(enemyTank.x, enemyTank.y, tc).start();
-				}
+				missile.hitWall(tc.w1);
+				missile.hitWall(tc.w2);
 			}
+			
+			//对每颗子弹判断是否击中我方坦克
+			hitTank(missile, tc.myTank);
+			
+			
 			if(missile.isLive())
 				missile.draw(gc);
 			else {
@@ -189,6 +218,16 @@ public class Tank {
 		}
 			
 		move();
+	}
+
+	private boolean hitTank(Missile missile, Tank anyTank) {
+		if(missile.hitTank(anyTank))
+		{
+			
+			new Explode(anyTank.x, anyTank.y, tc).start();
+			return true;
+		}
+		return false;
 	}
 
 	private void drawTank(GC gc, Color red) {
@@ -293,7 +332,9 @@ public class Tank {
 			bD = false;
 			break;
 		case SWT.CTRL:
-			fire();
+			if (live) {
+				fire();
+			}
 			break;
 		default:
 			break;

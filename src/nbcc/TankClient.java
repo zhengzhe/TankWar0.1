@@ -27,7 +27,7 @@ public class TankClient {
 	protected int y=50;
 	protected Tank myTank = new Tank(50, 50, 30, 30,true,this);
 	protected List<Tank> enemyTanks = new ArrayList<Tank>();
-	
+	protected Wall w1 = new Wall(100, 200, 20, 150),w2=new Wall(300, 100, 300, 20);
 	
 	
 	
@@ -121,6 +121,8 @@ public class TankClient {
 				gcImage.fillRectangle(shell.getClientArea());
 				
 				gcImage.drawString("敌方坦克数量:"+enemyTanks.size(),20,30);
+				w1.draw(gcImage);
+				w2.draw(gcImage);
 				
 				if (myTank!=null) {
 					myTank.draw(gcImage);
@@ -131,8 +133,6 @@ public class TankClient {
 					Tank enemyTank = enemyTanks.get(i);
 					enemyTank.draw(gcImage);
 				}
-//					missile.draw(gcImage);
-//				}
 				
 				
 				//将内存中画好的图像一次性贴到屏幕上

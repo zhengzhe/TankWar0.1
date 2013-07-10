@@ -35,8 +35,6 @@ public class Missile {
 		this.good = isGood;
 	}
 	public void draw(GC gcImage) {
-		
-		
 		if (isLive()) {
 			Color color = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
 			gcImage.setBackground(color);
@@ -82,18 +80,15 @@ public class Missile {
 		if (x<0||y<0||x>TankClient.GAME_WIDTH||y>TankClient.GAME_HEIGHT) {
 			live = false;
 		}
-		
-		
 	}
 
 
-	public boolean hitTank(Tank enemyTank) {
-		Rectangle rec= new Rectangle(x, y, width, height);
+	public boolean hitTank(Tank anyTank) {
 		
 		//炮弹存在，坦克也活着，炮弹打到坦克上 而且，炮弹不能打自己
-		if(isLive()&& enemyTank.isLive()&& rec.intersects(enemyTank.getRect())&& good!=enemyTank.bGood )
+		if(isLive()&& anyTank.isLive()&& getRect().intersects(anyTank.getRect())&& good!=anyTank.bGood )
 		{
-			enemyTank.setLive(false);
+			anyTank.setLive(false);
 			this.live = false;
 			return true;
 		}
@@ -104,8 +99,23 @@ public class Missile {
 	}
 
 
+	private Rectangle getRect() {
+		return new Rectangle(x, y, width, height);
+	}
+
+
 	public void setLive(boolean isLive) {
 		this.live = isLive;
+	}
+
+
+	public boolean hitWall(Wall w) {
+		if (isLive()&&getRect().intersects(w.getRect())) {
+			
+			setLive(false);
+			return true;
+		}
+		return false;
 	}
 
 }

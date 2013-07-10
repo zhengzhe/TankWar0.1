@@ -34,7 +34,7 @@ public class Explode extends Thread{
 			});
 			
 			try {
-				Thread.sleep(15);
+				Thread.sleep(25);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
