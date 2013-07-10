@@ -1,6 +1,9 @@
 package nbcc;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import nbcc.Tank.Direction;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -19,6 +22,8 @@ public class Tank {
 	int height=30;
 	
 	boolean bGood;
+	
+	private static Random r = new Random();
 	
 	
 	public boolean bL=false,bU=false,bR=false,bD=false;
@@ -41,6 +46,7 @@ public class Tank {
 	List<Missile> missiles = new ArrayList<Missile>();
 	private TankClient tc;
 	private boolean live=true;
+	private int step;
 	
 	
 	public Tank(int x,int y,int width,int height,boolean isGood) {
@@ -61,10 +67,40 @@ public class Tank {
 
 
 
+	public Tank(int x, int y, int width, int height, boolean isGood, Direction d,		
+			TankClient tc) {
+		this(x,y,width,height,isGood,tc);
+		dir = d;
+	}
+
 	/**
 	 * 根据用户按下的键盘方向，来确定坦克的运动
 	 */
 	public void move() {
+		dealXY();
+		dealPtDir();		
+		dealBound();
+		if (!bGood) {
+			if (step==0) {
+				step = r.nextInt(12)+3;
+				Direction [] newDir = Direction.values();
+				dir = newDir[r.nextInt(newDir.length)];
+			}
+			
+			if (r.nextInt(40)>38) {
+				fire();
+			}
+			step--;
+		}
+	}
+
+	private void dealPtDir() {
+		if (dir!=Direction.STOP) {
+			ptDir = dir;
+		}
+	}
+
+	private void dealXY() {
 		switch (dir) {
 		case L:
 			x-=STEP_LEN;
@@ -97,46 +133,53 @@ public class Tank {
 		default:
 			break;
 		}
-		if (dir!=Direction.STOP) {
-			ptDir = dir;
-		}
-		
+	}
+
+	/**
+	 * 边界处理
+	 */
+	private void dealBound() {
 		if (x<0) {
 			x=0;
 		}
 		if (y<0) {
 			y=0;
 		}
-		if (x>TankClient.GAME_WIDTH-width) {
-			x=TankClient.GAME_WIDTH-width;
+		if (x>tc.shell.getClientArea().width-width) {
+			x=tc.shell.getClientArea().width-width;
 		}
-		if (y>TankClient.GAME_HEIGHT-height) {
-			y=TankClient.GAME_HEIGHT-height;
+		if (y>tc.shell.getClientArea().height-height) {
+			y=tc.shell.getClientArea().height-height;
 		}
-		
 	}
 	public void draw(GC gc) {
 		
 		
 		Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
-		gc.setBackground(red);
-		gc.drawString("炮弹数量"+missiles.size(),20,10);
-		
-		if (bGood) {
-			gc.setBackground(red);
-		}else {
-			gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
-		}
+//		gc.setBackground(red);
 		if (live) {
-			gc.fillOval(x, y, width, height);
-			drawPtDir(gc);
+			if (bGood) {
+				//绘制我方坦克
+				gc.drawString("炮弹数量"+missiles.size(),20,10);
+				drawTank(gc, red);
+			}else {
+				//绘制敌方坦克
+				drawTank(gc,Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
+			}
 		}
 		
+		
+		//绘制炮弹
 		for (int i = 0; i < missiles.size(); i++) {
 			Missile missile = missiles.get(i);
-			if(missile.hitTank(tc.enemyTank))
-			{
-				new Explode(tc.enemyTank.x, tc.enemyTank.y, tc).start();
+			
+			for (int j = 0; j < tc.enemyTanks.size(); j++) {
+				Tank enemyTank = tc.enemyTanks.get(j);
+				if(missile.hitTank(enemyTank))
+				{
+					tc.enemyTanks.remove(enemyTank);
+					new Explode(enemyTank.x, enemyTank.y, tc).start();
+				}
 			}
 			if(missile.isLive())
 				missile.draw(gc);
@@ -146,6 +189,12 @@ public class Tank {
 		}
 			
 		move();
+	}
+
+	private void drawTank(GC gc, Color red) {
+		gc.setBackground(red);
+		gc.fillOval(x, y, width, height);
+		drawPtDir(gc);
 	}
 
 	private void drawPtDir(GC gc) {
@@ -177,9 +226,6 @@ public class Tank {
 			break;
 		}
 	}
-
-
-
 
 	public void keyPressed(KeyEvent e) {
 		System.out.println(e.character+" Pressed");
@@ -260,7 +306,7 @@ public class Tank {
 		int x  = this.x + width/2-Missile.width/2;
 		int y = this.y +height/2-Missile.height/2;
 		
-		Missile m = new Missile(x,y,ptDir);
+		Missile m = new Missile(x,y,bGood,ptDir);
 		missiles.add(m);
 		return m;
 	}
@@ -271,6 +317,10 @@ public class Tank {
 
 	public void setLive(boolean isLive) {
 		this.live = isLive;
+	}
+	
+	public boolean isLive() {
+		return live;
 	}
 	
 	

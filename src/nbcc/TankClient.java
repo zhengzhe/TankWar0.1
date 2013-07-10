@@ -1,5 +1,10 @@
 package nbcc;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import nbcc.Tank.Direction;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -21,7 +26,7 @@ public class TankClient {
 	protected int x=50;
 	protected int y=50;
 	protected Tank myTank = new Tank(50, 50, 30, 30,true,this);
-	protected Tank enemyTank = new Tank(100, 50, 50, 50, false);
+	protected List<Tank> enemyTanks = new ArrayList<Tank>();
 	
 	
 	
@@ -92,6 +97,14 @@ public class TankClient {
 		
 		shell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
 		
+		
+		for (int i = 0; i < 10; i++) {
+			
+			enemyTanks.add(new Tank(100+i*50, 100, 30, 30, false,Direction.D,this));
+			
+		}
+		
+		
 		//匿名内类，通常，如果需要实现某个接口，而不想定义一个完整类，
 		shell.addPaintListener(new PaintListener() {
 			
@@ -107,13 +120,17 @@ public class TankClient {
 				gcImage.setBackground(shell.getBackground());
 				gcImage.fillRectangle(shell.getClientArea());
 				
+				gcImage.drawString("敌方坦克数量:"+enemyTanks.size(),20,30);
+				
 				if (myTank!=null) {
 					myTank.draw(gcImage);
 				}
-				if (enemyTank!=null) {
+				
+				//绘制所有的敌方坦克
+				for (int i = 0; i < enemyTanks.size(); i++) {
+					Tank enemyTank = enemyTanks.get(i);
 					enemyTank.draw(gcImage);
 				}
-//				if (missile!=null) {
 //					missile.draw(gcImage);
 //				}
 				

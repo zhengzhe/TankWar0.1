@@ -20,17 +20,19 @@ public class Missile {
 	
 	private boolean live=true;
 	private Explode e;
+	private boolean good;
 	
 	public boolean isLive() {
 		return live;
 	}
 	
 	
-	public Missile(int x, int y, Direction dir) {
+	public Missile(int x, int y, boolean isGood,Direction dir) {
 		super();
 		this.x = x;
 		this.y = y;
 		this.dir = dir;
+		this.good = isGood;
 	}
 	public void draw(GC gcImage) {
 		
@@ -87,7 +89,9 @@ public class Missile {
 
 	public boolean hitTank(Tank enemyTank) {
 		Rectangle rec= new Rectangle(x, y, width, height);
-		if(rec.intersects(enemyTank.getRect())&& isLive())
+		
+		//炮弹存在，坦克也活着，炮弹打到坦克上 而且，炮弹不能打自己
+		if(isLive()&& enemyTank.isLive()&& rec.intersects(enemyTank.getRect())&& good!=enemyTank.bGood )
 		{
 			enemyTank.setLive(false);
 			this.live = false;
