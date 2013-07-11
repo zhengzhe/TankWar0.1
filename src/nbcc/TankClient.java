@@ -1,30 +1,28 @@
 package nbcc;
 
-import nbcc.Tank.Direction;
-
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 
 public class TankClient {
 
-	public static final int GAME_HEIGHT = 600;
-	public static final int GAME_WIDTH = 800;
 	
-	protected Shell shell;
-	protected int x=50;
-	protected int y=50;
-	protected Tank myTank = new Tank(50, 50, 30, 30,this);
-	public Missile missile =null;
+	protected static Shell shell;
+	private Context context = Context.getInstance();
+	private Display display;
+	private Composite warArea;
+	private Thread t;
+	
 	
 	
 	//内部类，定义在其他类的内部
@@ -38,14 +36,16 @@ public class TankClient {
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						shell.redraw();
+						warArea.redraw();
 					}
 				});
 				
 				try {
 					Thread.sleep(50);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
+					System.out.println("thread exit...");
+					break;
 				}
 			}
 		}
@@ -69,11 +69,12 @@ public class TankClient {
 	 * Open the window.
 	 */
 	public void open() {
-		Display display = Display.getDefault();
+		display = Display.getDefault();
 		createContents();
 		shell.open();
 		
-		new Thread(new PaintThread()).start();
+		t = new Thread(new PaintThread());
+		t.start();
 		shell.layout();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
@@ -86,69 +87,32 @@ public class TankClient {
 	 * Create contents of the window.
 	 */
 	protected void createContents() {
-		shell = new Shell(SWT.CLOSE|SWT.NO_BACKGROUND|SWT.DOUBLE_BUFFERED);
-		shell.setSize(GAME_WIDTH, GAME_HEIGHT);//硬编码
-		Rectangle screen = Display.getDefault().getPrimaryMonitor().getBounds();
-		shell.setLocation((screen.width-GAME_WIDTH)/2,(screen.height-GAME_HEIGHT)/2);
+		shell = new Shell(display,SWT.CLOSE|SWT.NO_BACKGROUND|SWT.DOUBLE_BUFFERED);
+		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
-		shell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
-		
-		//匿名内类，通常，如果需要实现某个接口，而不想定义一个完整类，
-		shell.addPaintListener(new PaintListener() {
-			
-			@Override
-			public void paintControl(PaintEvent e) {
-				
-				//在内存中创建图像缓冲区
-				Image bufferScreen = new Image(null, shell.getClientArea());
-				//创建一支能在图像缓冲区上绘制的"画笔"
-				GC gcImage = new GC(bufferScreen);
-				
-				//在内存缓冲区中绘制图形
-				gcImage.setBackground(shell.getBackground());
-				gcImage.fillRectangle(shell.getClientArea());
-				
-				if (myTank!=null) {
-					myTank.draw(gcImage);
-				}
-				if (missile!=null) {
-					missile.draw(gcImage);
-				}
-				
-				
-				//将内存中画好的图像一次性贴到屏幕上
-				e.gc.drawImage(bufferScreen, 0, 0);
-				
-				//释放资源
-				if (bufferScreen!=null) {
-					bufferScreen.dispose();
-					bufferScreen=null;
-				}
-				if (gcImage!=null) {
-					gcImage.dispose();
-					gcImage=null;
-				}
-				
-			}
-		});
-		
-		
-		
-		shell.addKeyListener(new KeyListener() {
-			
-			@Override
-			public void keyReleased(KeyEvent e) {
-				myTank.keyReleased(e);
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent e) {
-				myTank.keyPressed(e);
-			}
-		});
+		warArea = new TankShell(shell, SWT.CLOSE|SWT.NO_BACKGROUND|SWT.DOUBLE_BUFFERED);
+		Rectangle screen = display.getPrimaryMonitor().getBounds();
+		shell.setLocation((screen.width-Context.GAME_WIDTH)/2,(screen.height-Context.GAME_HEIGHT)/2);
+		warArea.setBackground(Utils.getSystemColor(SWT.COLOR_GREEN));
+		context.setWarArea(warArea);
 		
 		shell.setText("\u5766\u514B\u5927\u6218\u6E38\u620FV1.0");
+		
+		
+		//适配器模式
+		shell.addShellListener(new ShellAdapter() {
+			
+			@Override
+			public void shellClosed(ShellEvent e) {
+				boolean isConfirm = MessageDialog.openConfirm(shell, "确认", "是否真的要退出游戏?");
+				if (isConfirm) {
+					t.interrupt();
+					
+				}
+			}
+		});
 
 	}
+
 
 }
